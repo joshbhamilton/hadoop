@@ -23,6 +23,18 @@ execute "apt-get update" do
   action :nothing
 end
 
+package "curl"
+
+execute "download cdh4" do
+  command "curl -o cdh4-repository_1.0_all.deb http://archive.cloudera.com/cdh4/one-click-install/lucid/amd64/cdh4-repository_1.0_all.deb"
+  action :run
+end
+
+execute "install cdh4 package" do
+  command "dpkg -i cdh4-repository_1.0_all.deb"
+  action :run
+end
+
 template "/etc/apt/sources.list.d/cloudera.list" do
   owner "root"
   mode "0644"
@@ -34,5 +46,43 @@ execute "curl -s http://archive.cloudera.com/debian/archive.key | apt-key add -"
   not_if "apt-key export 'Cloudera Apt Repository'"
 end
 
-package "hadoop"
+execute "apt-get update" do
+  action :nothing
+end
 
+package "hadoop-0.20-conf-pseudo"
+
+template "/etc/hadoop/conf/hadoop-env.sh" do
+  owner "root"
+  mode "0644"
+  source "hadoop-env.sh"
+end
+
+execute "namemode -format" do
+  command "sudo -u hdfs hdfs namenode -format"
+  action :run
+end
+
+execute "start hdfs" do
+  command "for x in `cd /etc/init.d ; ls hadoop-hdfs-*` ; do sudo service $x start ; done"
+  action :run
+end
+
+execute "sudo -u hdfs hadoop fs -mkdir /tmp"
+execute "sudo -u hdfs hadoop fs -chmod -R 1777 /tmp"
+
+execute "sudo -u hdfs hadoop fs -mkdir -p /var/lib/hadoop-hdfs/cache/mapred/mapred/staging"
+execute "sudo -u hdfs hadoop fs -chmod 1777 /var/lib/hadoop-hdfs/cache/mapred/mapred/staging"
+execute "sudo -u hdfs hadoop fs -chown -R mapred /var/lib/hadoop-hdfs/cache/mapred"
+
+execute "start mapreduce" do
+  command "for x in `cd /etc/init.d ; ls hadoop-0.20-mapreduce-*` ; do sudo service $x start ; done"
+  action :run
+end
+
+execute "create hdfs dir" do
+  command "sudo -u hdfs hadoop fs -mkdir /user/vagrant"
+  action :run
+end
+execute "sudo -u hdfs hadoop fs -chown vagrant /user/vagrant"
+execute "sudo -u vagrant hadoop fs -mkdir input"

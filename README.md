@@ -1,8 +1,9 @@
 Description
 ===========
 
-Installs Apache hadoop and sets up a basic distributed cluster per the
-quick start documentation.
+This is a modification of the [Opscode Hadoop recipe](https://github.com/opscode-cookbooks/hadoop).
+
+Installs Apache Hadoop and sets up a pseudo-distributed configuration. Used primarily with Vagrant setup.
 
 Requirements
 ============
@@ -11,51 +12,20 @@ Requirements
 
 * Debian/Ubuntu
 
-Tested on Ubuntu 8.10, though should work on most Linux distributions,
-see `hadoop[:java_home]`.
+Tested on Ubuntu 10.04, though should work on most Linux distributions.
 
 ## Cookbooks:
 
+* apt
 * java
-
-Attributes
-==========
-
-* `hadoop[:mirror_url]` - Get a mirror from http://www.apache.org/dyn/closer.cgi/hadoop/core/.
-* `hadoop[:version]` - Specify the version of hadoop to install.
-* `hadoop[:uid]` - Default userid of the hadoop user.
-* `hadoop[:gid]` - Default group for the hadoop user.
-* `hadoop[:java_home]` - You will probably want to change this to match where Java is installed on your platform.
-
-You may wish to add more attributes for tuning the configuration file templates.
 
 Usage
 =====
 
-This cookbook performs the tasks described in the Hadoop Quick
-Start[1] to get the software installed. You should copy this to a
-site-cookbook and modify the templates to meet your requirements.
 
-Once the recipe is run, the distributed filesystem can be formated
-using the script /usr/bin/hadoop.
+This cookbook will install Cloudera's CDH4 following the instructions [here](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Quick-Start/cdh4qs_topic_3_3.html).
 
-    sudo -u hadoop /usr/bin/hadoop namenode -format
-  
-You may need to set up SSH keys for hadoop management commands. 
-
-Note that this is not the 'default' config per se, so using the
-start-all.sh script won't start the processes because the config files
-live elsewhere. For running various hadoop processes as services, we
-suggest runit. A sample 'run' script is provided. The HADOOP_LOG_DIR
-in the run script must exist for each process. These could be wrapped
-in a define.
-
-* datanode
-* jobtracker
-* namenode
-* tasktracker
-
-[1] http://hadoop.apache.org/core/docs/current/quickstart.html
+This will install Hadoop and configure it to run in Pseudo-distributed mode. The filesystem has been formatted and is ready to start executing MapReduce jobs.
 
 License and Author
 ==================
